@@ -35,7 +35,7 @@ class Node {
         $this->blocksBehind = $this->blockHeightDaemon - $this->blockHeight;
         
         $this->groupsC = checkInt($info['groups']);
-        $this->peersC = checkInt($info['peers']['total']);
+        $this->peersC = checkInt($info['peers']['total']['good']);
         $this->sessionsC = checkInt($info['sessions']);
         $this->subscriptionsC = checkInt($info['subs']);
         $this->txSentC = checkInt($info['txs_sent']);
