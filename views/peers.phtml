@@ -1,0 +1,171 @@
+          <!-- Top Info Bar -->
+         <div class="panel panel-default">  
+            <div class="panel-body">
+                <div class="row tile_count">
+                    <div class="col-md-1 col-sm-4 col-xs-6 tile_stats_count">
+                      <span class="count_top"><i class="fa fa-user"></i> Total Peers</span>
+                      <div class="count"><?= $content['peersc'] ?></div>
+                      <span class="count_bottom"> <?= $content['mostpop']['ips'] ?></span> Servers</span>
+                    </div>
+                    <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
+                      <span class="count_top"><i class="fa fa-star" style="color:#EDDA74;"></i> Most Popular Client Version</span>
+                      <div class="count"><?= $content['mostpop']['mpCli'] ?></div>
+                      <span class="count_bottom"> <?= $content['mostpop']['mpCliC'] ?> Peers</span>
+                    </div>
+                      <?php if($content['geo']){ ?>
+                    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                      <span class="count_top"><i class="fa fa-globe blue"></i> Most Popular Country</span>
+                      <div class="count"><?= $content['mostpop']['mpCou'] ?></div>
+                      <span class="count_bottom"><?= $content['mostpop']['mpCouC'] ?> Peers</span>
+                    </div>
+                    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                      <span class="count_top"><i class="fa fa-server" style="color:orange;"></i> Most Popular ISP</span>
+                      <div class="count"><?= $content['mostpop']['mpIsp'] ?></div>
+                      <span class="count_bottom"><?= $content['mostpop']['mpIspC'] ?> Peers</span>
+                    </div>
+                    <?php } ?>
+                    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                      <span class="count_top"><i class="fa fa-hourglass-start"></i> SSL Support</span>
+                      <div class="count"><?= $content['mostpop']['sslp'] ?><small> %</small></div>
+                      <span class="count_bottom"><span><?= $content['mostpop']['sslc'] ?></span> Peers</span>
+                    </div>                  
+                    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                      <span class="count_top"><i class="fa fa-hourglass-start"></i> Tor Support</span>
+                      <div class="count"><?= $content['mostpop']['torp'] ?><small> %</small></div>
+                      <span class="count_bottom"><span><?= $content['mostpop']['torc'] ?></span> Peers</span>
+                    </div>                    
+                  </div>
+                  </div>
+             </div>
+			<!-- Top Info Bar End-->
+			<div class="clearfix"></div>
+          <div class="row">
+            <div class="col-md-3 col-sm-3 col-xs-12">
+                <?php if(!empty($error)){ ?> <div class="alert alert-danger" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <?= $error ?> </div><?php }
+                if(!empty($message)){ ?> <div class="alert alert-success" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <?= $message ?> </div><?php } ?>
+            </div>  
+          </div>
+
+            <!-- Content -->                   
+            <div class="row">
+            
+            <!-- Peer List -->
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Peers <small>Known</small></h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                      <li><a class="close-link"><i class="fa fa-close"></i></a>
+                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+					  <li><a><i class="fa fa-question-circle-o" data-toggle="tooltip" data-html="true" data-placement="left" title="
+                      Click the 'Rules' button below to run rules."></i></a>
+                      </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <table id="connectedpeers" class="table table-striped table-bordered table-valign">
+                      <thead>
+                        <tr>
+                          <th>Host</th>
+                          <th>IP</th>
+        <?php if($content['geo']){ ?> <th>Country</th> <?php } ?>
+        <?php if($content['geo']){ ?> <th>ISP</th> <?php } ?>
+                          <th>Status</th>
+                          <th>Client</th>
+                          <th>Services</th>
+                          <th>Information</th>
+                        </tr>
+                      </thead>
+
+
+                      <tbody>
+                        <?php $i = 0;
+                              foreach($content['peers'] as $peer){ ?>
+                                    <tr>
+                                        <td style="padding-right:0px;"><?=$peer->host ?></td>
+                                        <td><?=$peer->ip ?></td>  
+                      <?php if($content['geo']){?><td><?php if(!empty($peer->country)){ ?><img src="assets/images/flags/16/<?=$peer->country ?>.png" /> <?php echo $peer->country; } ?></td><?php } ?>  
+                     <?php if($content['geo']){ ?> <td><?= $peer->isp ?></td> <?php } ?>  
+                                        <td> <?= $peer->status ?></td>
+                                        <td> <?= $peer->client ?></td>   
+                                        <td> 
+                                        <?php
+										if($peer->ssl) echo '<button type="button" class="btn btn-default btn-xs">SSL</button>'; 
+										if($peer->tcp) echo '<button type="button" class="btn btn-default btn-xs">TCP</button>';  
+										if($peer->tor) echo '<button type="button" class="btn btn-default btn-xs">Tor</button> '; 
+										?> 
+                                        </td>
+                                        <td>                                           
+                                            <div class="btn-group pull-left" style="padding:5px 0 3px 7px; margin-bottom:0px">
+                                                <button type="button" class="btn btn-default btn-xs">Details</button>
+                                                <button type="button" class="btn btn-default dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <span class="caret"></span>
+                                                    <span class="sr-only">Toggle Dropdown</span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a href="http://ip-api.com/#<?= $peer->ip ?>" target="_blank"><i class="fa fa-globe fa-lg" style="color:lightblue"></i> Whois</a></li>
+                                                <li><a href="https://duckduckgo.com/?q=<?= $peer->ip ?>" target="_blank"><i class="fa fa-search fa-lg" style="color:lightblue"></i> DuckDuckGo</a></li>                                                  
+                                                <li><a href="https://www.abuseipdb.com/check/<?= $peer->ip ?>" target="_blank"><i class="fa fa-search-minus fa-lg" style="color:lightblue"></i> AbuseIP DB</a></li>
+                                            </ul>
+                                            </div>                                           
+                                   </td>                                           
+                                  </tr>                                      
+                        <?php } ?>                        
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="clearfix"></div>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /page content -->
+
+    <!-- footer content -->
+    <?php include('views/footer.phtml') ?>
+    <!-- /footer content -->
+    </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="assets/js/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="assets/js/bootstrap.min.js"></script>
+    <!-- Datatables -->
+    <script src="assets/js/jquery.dataTables.min.js"></script>
+    <script src="assets/js/dataTables.bootstrap.min.js"></script>
+    <script src="assets/js/dataTables.buttons.min.js"></script>
+    <script src="assets/js/responsive.bootstrap.js"></script>
+
+    <!-- Custom Theme Scripts -->
+    <script src="assets/js/custom.min.js"></script>
+
+    <!-- Datatables -->
+    <script>
+      $(document).ready(function() {
+        
+        $('#connectedpeers').DataTable( {
+            paging:   false,
+            bInfo: false,
+            dom: '<"dataTables_exportbtn"B>ft',
+            buttons: [
+                        {
+                          text: 'Rules',
+                          className: "btn btn-info",
+                          action: function () {
+                                    document.location = "?p=sessions&c=run&t=<?= $_SESSION["csfrToken"] ?>";
+                                  }
+                        }
+            ]
+        } );
+        
+      });
+    </script>
+    <!-- /Datatables -->
+  </body>
+</html>

@@ -1,0 +1,183 @@
+          <!-- Top Info Bar -->
+         <div class="panel panel-default">  
+            <div class="panel-body">
+                <div class="row tile_count">
+                    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                      <span class="count_top"><i class="fa fa-user"></i> Total Sessions</span>
+                      <div class="count"><?= $content['sessionsc'] ?></div>
+                      <span class="count_bottom"><i class="fa fa-envelope-o"></i><?= $content['mostpop']['subscribersc'] ?> <?= "Subscribers (".$content['mostpop']['txsc']." TX send)" ?></span>
+                    </div>
+                    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                      <span class="count_top"><i class="fa fa-star" style="color:#EDDA74;"></i> Most Popular Client Version</span>
+                      <div class="count"><?= $content['mostpop']['mpCli'] ?></div>
+                      <span class="count_bottom"><i class="fa fa-user-o"></i><?= $content['mostpop']['mpCliC'] ?> Sessions</span>
+                    </div>
+                      <?php if($content['geo']){ ?>
+                    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                      <span class="count_top"><i class="fa fa-globe blue"></i> Most Popular Country</span>
+                      <div class="count"><?= $content['mostpop']['mpCou'] ?></div>
+                      <span class="count_bottom"><i class="fa fa-user-o"></i><?= $content['mostpop']['mpCouC'] ?> Sessions</span>
+                    </div>
+                    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                      <span class="count_top"><i class="fa fa-server" style="color:orange;"></i> Most Popular ISP</span>
+                      <div class="count"><?= $content['mostpop']['mpIsp'] ?></div>
+                      <span class="count_bottom"><i class="fa fa-user-o"></i><?= $content['mostpop']['mpIspC'] ?> Sessions</span>
+                    </div>
+                    <?php } ?>
+                    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                      <span class="count_top"><i class="fa fa-hourglass-start"></i> SSL Connections</span>
+                      <div class="count"><?= $content['mostpop']['sslp'] ?><small> %</small></div>
+                      <span class="count_bottom"><i class="fa fa-user-o"></i><span><?= $content['mostpop']['sslc'] ?></span> Sessions</span>
+                    </div>
+                    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                      <span class="count_top"><i class="fa fa-cloud" style="color:lightblue;"></i> Total Traffic</span>
+                      <div class="count"><?= ($content['traffic'] >= 1000) ? round($content['traffic']/1000,1)." <small>GB</small>" : round($content['traffic'],1)." <small>MB</small>"?></div>
+                      <span class="count_bottom"><i class="fa fa-cloud-upload"></i> <?= $content['trafficinp'] ?>% upload</span>
+                    </div>
+                  </div>
+                  </div>
+             </div>
+			<!-- Top Info Bar End-->
+			<div class="clearfix"></div>
+          <div class="row">
+            <div class="col-md-3 col-sm-3 col-xs-12">
+                <?php if(!empty($error)){ ?> <div class="alert alert-danger" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <?= $error ?> </div><?php }
+                if(!empty($message)){ ?> <div class="alert alert-success" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <?= $message ?> </div><?php } ?>
+            </div>  
+          </div>
+
+            <!-- Content -->                   
+            <div class="row">
+            
+            <!-- Peer List -->
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Sessions <small>Established</small></h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                      <li><a class="close-link"><i class="fa fa-close"></i></a>
+                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+					  <li><a><i class="fa fa-question-circle-o" data-toggle="tooltip" data-html="true" data-placement="left" title="
+                      Click the 'Rules' button below to run rules."></i></a>
+                      </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <table id="connectedpeers" class="table table-striped table-bordered table-valign">
+                      <thead>
+                        <tr>
+                          <th>ID</th>
+                          <th><small>IP</small></th>
+        <?php if($content['geo']){ ?> <th>Country</th> <?php } ?>
+        <?php if($content['geo']){ ?> <th>ISP</th> <?php } ?>
+                          <th style="min-width:48px;">Age <span style="font-weight:normal;">(h)</span></th>
+                          <th>Client</th>
+                          <th style="min-width:70px;">Traffic <span style="font-weight:normal;">(MB)</span></th>
+                          <th>Subscriptions</th>
+                          <th>TXs</th>
+                          <th style="min-width:145px;">Control</th>
+                        </tr>
+                      </thead>
+
+
+                      <tbody>
+                        <?php $i = 0;
+                              foreach($content['sessions'] as $session){ ?>
+                                    <tr>
+                                        <td style="padding-right:0px;"><?=$session->id ?></td>
+                                        <td><?=$session->ip ?></td>  
+                      <?php if($content['geo']){?><td><?php if(!empty($session->country)){ ?><img src="assets/images/flags/16/<?=$session->country ?>.png" /> <?php echo $session->country; } ?></td><?php } ?>  
+                     <?php if($content['geo']){ ?> <td><?php if($session->hosted){ ?><i class="fa fa-cloud"></i><?php } else{ ?><span style="padding-left:18px;"></span><?php } ?> <?= substr($session->isp,0,23) ?></td> <?php } ?>  
+                                        <td> <?= $session->ageHours ?></td>
+                                        <td> <?= $session->client ?></td>   
+                                        <td> <?= $session->traffic ?></td>
+                                        <td> <?= $session->subscriptionsC ?></td>
+                                        <td> <?= $session->txsC ?></td>
+                                        <td>
+
+                                            <div class="btn-group pull-left" style="padding:5px 0 3px 0px; margin-bottom:0px">
+                                                <button type="button" class="btn btn-default btn-xs">Manage</button>
+                                                <button type="button" class="btn btn-default dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <span class="caret"></span>
+                                                    <span class="sr-only">Toggle Dropdown</span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a href="?p=sessions&c=disconnect&ip=<?=$session->id ?>&t=<?= $_SESSION["csfrToken"] ?>"><i class="fa fa-times" style="color:darkorange"></i> Disconnect</a></li>
+          <?php if($content['geo'] AND !$session->hosted){ ?> <li class="divider"></li>
+                                                <li><a href="?p=sessions&c=addhoster&n=<?= $session->isp ?>&t=<?= $_SESSION["csfrToken"] ?>"><i class="fa fa-plus" style="color:green"></i> Add Hoster (ISP)</a></li> <?php } ?>   
+                                            </ul>
+                                            </div>
+                                            
+                                            <div class="btn-group pull-left" style="padding:5px 0 3px 7px; margin-bottom:0px">
+                                                <button type="button" class="btn btn-default btn-xs">Details</button>
+                                                <button type="button" class="btn btn-default dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <span class="caret"></span>
+                                                    <span class="sr-only">Toggle Dropdown</span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a href="http://ip-api.com/#<?= $session->ip ?>" target="_blank"><i class="fa fa-globe fa-lg" style="color:lightblue"></i> Whois</a></li>
+                                                <li><a href="https://duckduckgo.com/?q=<?= $session->ip ?>" target="_blank"><i class="fa fa-search fa-lg" style="color:lightblue"></i> DuckDuckGo</a></li>                                                  
+                                                <li><a href="https://www.abuseipdb.com/check/<?= $session->ip ?>" target="_blank"><i class="fa fa-search-minus fa-lg" style="color:lightblue"></i> AbuseIP DB</a></li>
+                                            </ul>
+                                            </div>                                           
+                                   </td>                                           
+                                  </tr>                                      
+                        <?php } ?>                        
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="clearfix"></div>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /page content -->
+
+    <!-- footer content -->
+    <?php include('views/footer.phtml') ?>
+    <!-- /footer content -->
+    </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="assets/js/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="assets/js/bootstrap.min.js"></script>
+    <!-- Datatables -->
+    <script src="assets/js/jquery.dataTables.min.js"></script>
+    <script src="assets/js/dataTables.bootstrap.min.js"></script>
+    <script src="assets/js/dataTables.buttons.min.js"></script>
+    <script src="assets/js/responsive.bootstrap.js"></script>
+
+    <!-- Custom Theme Scripts -->
+    <script src="assets/js/custom.min.js"></script>
+
+    <!-- Datatables -->
+    <script>
+      $(document).ready(function() {
+        
+        $('#connectedpeers').DataTable( {
+            paging:   false,
+            bInfo: false,
+            dom: '<"dataTables_exportbtn"B>ft',
+            buttons: [
+                        {
+                          text: 'Rules',
+                          className: "btn btn-info",
+                          action: function () {
+                                    document.location = "?p=sessions&c=run&t=<?= $_SESSION["csfrToken"] ?>";
+                                  }
+                        }
+            ]
+        } );
+        
+      });
+    </script>
+    <!-- /Datatables -->
+  </body>
+</html>

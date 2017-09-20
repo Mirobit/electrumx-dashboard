@@ -1,0 +1,16 @@
+<footer>
+<div class="pull-right">
+<a href="https://github.com/Mirobit/electrumx-dashboard"> ElectrumX Dashboard v0.1</a> - © 2017
+</div>
+<div class="clearfix"></div>
+</footer>
+<script type="text/javascript">
+	<?php
+	if($this->section === "main"){
+		$section = "";
+	}else{
+		$section = "?p=".$this->section;
+	}
+	?>
+    window.history.pushState("", "", "<?= $section ?>");
+</script>
