@@ -105,7 +105,7 @@
                                                     <span class="sr-only">Toggle Dropdown</span>
                                             </button>
                                             <ul class="dropdown-menu">
-                                                <li><a href="?p=sessions&c=disconnect&ip=<?=$session->id ?>&t=<?= $_SESSION["csfrToken"] ?>"><i class="fa fa-times" style="color:darkorange"></i> Disconnect</a></li>
+                                                <li><a href="?p=sessions&c=disconnect&id=<?=$session->id ?>&t=<?= $_SESSION["csfrToken"] ?>"><i class="fa fa-times" style="color:darkorange"></i> Disconnect</a></li>
           <?php if($content['geo'] AND !$session->hosted){ ?> <li class="divider"></li>
                                                 <li><a href="?p=sessions&c=addhoster&n=<?= $session->isp ?>&t=<?= $_SESSION["csfrToken"] ?>"><i class="fa fa-plus" style="color:green"></i> Add Hoster (ISP)</a></li> <?php } ?>   
                                             </ul>
