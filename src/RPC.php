@@ -11,7 +11,7 @@ class RPC {
         $this->socket = fsockopen($host, $port, $errno, $errstr, 5);
         // Check socket
         if ($this->socket === false) {
-        throw new Exception('Connection to "' . $host . ':' . $port . '" failed (errno ' . $errno . '): ' . $errstr);
+        throw new \Exception('Connection to "' . $host . ':' . $port . '" failed (errno ' . $errno . '): ' . $errstr);
         } 
     }
     
@@ -25,13 +25,13 @@ class RPC {
         $response = fgets($this->socket);
 
         if ($response === false) {
-            throw new Exception('Connection to failed');
+            throw new \Exception('Connection to failed');
         }
 
         $result = json_decode($response, true);
         
         if(isset($result['error'])){
-            throw new Exception($result['error']['message']);
+            throw new \Exception($result['error']['message']);
         }
         
         $result = $result['result'];

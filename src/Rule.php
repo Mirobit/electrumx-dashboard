@@ -141,7 +141,7 @@ class Rule {
 						try{
 							$bitcoind->disconnectnode($session->ip);
 							$logging .= $logTime.": Disconnected (".$rule->trigger."): ".$session->ip." (".$session->client.") - (".$rule->id.")\r\n";
-						}catch(Exception $e) {
+						}catch(\Exception $e) {
 							$logging .= $logTime.": Error disconnecting ".$session->ip." (".$rule->id.")\r\n";
 						}
                         break;
