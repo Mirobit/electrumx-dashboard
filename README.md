@@ -2,7 +2,7 @@
 
 ![](https://i.imgur.com/TU8tpXK.png)
 
-ElectrumX Dashboard (EXD) is a lightweight dashboard for ElectrumX servers.
+ElectrumX Dashboard (EXD) is a lightweight dashboard for [ElectrumX](https://github.com/spesmilo/electrumx) servers.
 
 ## Features
 
