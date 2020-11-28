@@ -5,12 +5,12 @@
 					<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
 					  <span class="count_top"><i class="fa fa-user"></i> Sessions</span>
 					  <div class="count"><?= $content['node']->sessionsC ?></div>
-					  <span class="count_bottom"><span class="green" ><i class="fa fa-plug"></i><?= $content['node']->subscriberC ?></span> Subscriber</span>
+					  <span class="count_bottom"><i class="fa fa-plug" style="color:lightblue;"></i><?= $content['node']->subscriberC ?> Subscribers</span>
 					</div>
 					<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
 					  <span class="count_top"><i class="fa fa-user fa-eye"></i> Requests</span>
 					  <div class="count"><?= number_format($content['node']->requestsC) ?></div>
-					  <span class="count_bottom"><i class="green"><i class="fa fa-envelope-o"></i><?= $content['node']->txSentC ?></i> TXs send</span>
+					  <span class="count_bottom"><i class="fa fa-envelope-o" style="color:lightblue;"></i><?= $content['node']->txSentC ?> TXs send</span>
 					</div>                    
 					<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
 					  <span class="count_top"><i class="fa fa-cloud-upload"></i> Upload Traffic <?= ($content['totaltrafficout'] >= 1000) ? "(GB)" : "(MB)"?></span>
@@ -28,7 +28,7 @@
 					<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
 					  <span class="count_top"><i class="fa fa-server"></i> Peers</span>
 					  <div class="count"><?= number_format($content['node']->peersC) ?></div>
-					  <span class="count_bottom"><i class="green"><i class="fa fa-clock-o"></i><?= $content['node']->uptime ?></i> online</span>
+					  <span class="count_bottom"><i class="fa fa-clock-o" style="color:lightblue;"></i><?= $content['node']->uptime ?> online</span>
 					</div>					
 				</div>
 	        </div>
