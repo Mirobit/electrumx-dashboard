@@ -17,7 +17,7 @@ class RPC {
     
     public function send(string $method, $param = ""){
         // sending request
-        fwrite($this->socket, '{"jsonrpc": "2.0", "id": null, "method": "'.$method.'", "params": ['.$param.']}');
+        fwrite($this->socket, '{"jsonrpc": "2.0", "id": 1, "method": "'.$method.'", "params": ['.$param.']}');
         fwrite($this->socket, "\n");
         fflush($this->socket);
 

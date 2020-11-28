@@ -25,8 +25,8 @@ class Node {
         
 		$info = $exd->send('getinfo');
         
-		$this->blockHeight = checkInt($info['db_height']);
-        $this->blockHeightDaemon = checkInt($info['daemon_height']);
+		$this->blockHeight = checkInt($info['db height']);
+        $this->blockHeightDaemon = checkInt($info['daemon height']);
         if($this->blockHeight == $this->blockHeightDaemon){
             $this->synced = TRUE;
         }else{
@@ -35,11 +35,11 @@ class Node {
         $this->blocksBehind = $this->blockHeightDaemon - $this->blockHeight;
         
         $this->groupsC = checkInt($info['groups']);
-        $this->peersC = checkInt($info['peers']['total']['good']);
-        $this->sessionsC = checkInt($info['sessions']);
-        $this->subscriptionsC = checkInt($info['subs']);
-        $this->txSentC = checkInt($info['txs_sent']);
-        $this->errorsC = checkInt($info['errors']);
+        $this->peersC = checkInt($info['peers']['total']);
+        $this->sessionsC = checkInt($info['sessions']['count']);
+        $this->subscriptionsC = checkInt($info['sessions']['subs']);
+        $this->txSentC = checkInt($info['txs sent']);
+        $this->errorsC = checkInt($info['sessions']['errors']);
         $this->uptime = htmlspecialchars($info['uptime']);
 	}
 }
