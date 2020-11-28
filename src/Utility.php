@@ -145,42 +145,42 @@ function getCleanClient($client){
 
 // Creates chart and legend (list)
 function getTopClients($sessions){
-    $clients = [];
-    $chartLabels = "";
-    $chartValue = ""; 
+  $clients = [];
+  $chartLabels = "";
+  $chartValue = ""; 
     
-    foreach($sessions as $session){
-        if(isset($clients["Electrum ".$session->client])){
-            $clients["Electrum ".$session->client]['count']++;
-        }else{
-            $clients["Electrum ".$session->client]['count'] = 1;
-        }
-    }
+  foreach($sessions as $session){
+      if(isset($clients["Electrum ".$session->client])){
+        $clients["Electrum ".$session->client]['count']++;
+      }else{
+          $clients["Electrum ".$session->client]['count'] = 1;
+      }
+  }
     
 	$peerCount = count($sessions);
-    $clientCount = count($clients);
-    arsort($clients);
-    $clients = array_slice($clients,0,9);    
-    if($clientCount > 9){
-        $clients['Other']['count'] = $clientCount-9;
-    }
+  $clientCount = count($clients);
+  arsort($clients);
+  $clients = array_slice($clients,0,9);    
+  if($clientCount > 9){
+    $clients['Other']['count'] = $clientCount-9;
+  }
 	
     
-    foreach($clients as $cName => &$client){
-        $chartLabels .= '"'.$cName.'",';
-        $chartValue .= $client['count'].',';
+  foreach($clients as $cName => &$client){
+    $chartLabels .= '"'.$cName.'",';
+    $chartValue .= $client['count'].',';
 		$client['share'] = round($client['count']/$peerCount,2)*100;
-    }
+  }
     
-    $chartData['labels'] = rtrim($chartLabels, ",");
-    $chartData['values'] = rtrim($chartValue, ",");
-    $chartData['legend'] = $clients;
+  $chartData['labels'] = rtrim($chartLabels, ",");
+  $chartData['values'] = rtrim($chartValue, ",");
+  $chartData['legend'] = $clients;
 
-    return $chartData;
+  return $chartData;
 }
 
 
-function getMostPop(array $peers, bool $sessionsB = true){
+function getMostPop(array $connections, bool $sessionsB = true){
     $clCountAr = [];
     $ctCountAr = [];
     $htCountAr = [];
@@ -190,57 +190,61 @@ function getMostPop(array $peers, bool $sessionsB = true){
     $result['torc'] = 0;
     $result['tcpc'] = 0;
     $result['subscribersc'] = 0;
-    $result['txsc'] = 0;
+		$result['txsc'] = 0;
+		$result['peersgc'] = 0;
     
-    foreach($peers as $peer){
+    foreach($connections as $connection){
         // Count ssl connections
-        if($peer->ssl){
+        if($connection->ssl){
             $result['sslc']++;
         }
-        
         if($sessionsB){
             // Count subscribers
-            if($peer->subscriptionsC > 0){
+            if($connection->subscriptionsC > 0){
                 $result['subscribersc']++;
             }  
             // Sum all txs send
-            $result['txsc'] += $peer->txsC;
+            $result['txsc'] += $connection->txsC;
         }else{
-            if($peer->tor){
-                $result['torc']++;
-            }
-            if($peer->tcp){
-                $result['tcpc']++;
-            }
-        }
+					// Count good peers
+					if($connection->status === "good") {
+						$result['peersgc']++;
+					}
+					if($connection->tor){
+						$result['torc']++;
+					}
+					if($connection->tcp){
+						$result['tcpc']++;
+					}	
+				}
         
         // Count different IPs
-         if(array_key_exists($peer->ip, $ipCountAr)){
-            $ipCountAr[$peer->ip]++;
+         if(array_key_exists($connection->ip, $ipCountAr)){
+            $ipCountAr[$connection->ip]++;
         }else{
-            $ipCountAr[$peer->ip] = 1;
+            $ipCountAr[$connection->ip] = 1;
         }
         
         // Count Client 1
-        if(array_key_exists($peer->client, $clCountAr)){
-            $clCountAr[$peer->client]++;
+        if(array_key_exists($connection->client, $clCountAr)){
+            $clCountAr[$connection->client]++;
         }else{
-            $clCountAr[$peer->client] = 1;
+            $clCountAr[$connection->client] = 1;
         }
         
         if(CONFIG::PEERS_GEO){
             // Count Country 1
-            if(array_key_exists($peer->countryCode, $ctCountAr)){
-                $ctCountAr[$peer->countryCode]++;
+            if(array_key_exists($connection->countryCode, $ctCountAr)){
+                $ctCountAr[$connection->countryCode]++;
             }else{
-                $ctCountAr[$peer->countryCode] = 1;
+                $ctCountAr[$connection->countryCode] = 1;
             }
             
             // Count ISP 1
-            if(array_key_exists($peer->isp, $htCountAr)){
-                $htCountAr[$peer->isp]++;
+            if(array_key_exists($connection->isp, $htCountAr)){
+                $htCountAr[$connection->isp]++;
             }else{
-                $htCountAr[$peer->isp] = 1;
+                $htCountAr[$connection->isp] = 1;
             }            
         }
     }
@@ -269,74 +273,49 @@ function getMostPop(array $peers, bool $sessionsB = true){
 }
 
 
-// Peer/Session functions
 
-function getSessionsData(bool $sessionsB = TRUE, bool $geo = NULL){
-    global $exd;
-	
-	// If not set, use config setting
-	if(is_null($geo)){
-		$geo = CONFIG::PEERS_GEO;
+function getSessionsData(bool $geo = NULL) {
+	global $exd;
+	$sessionsData['totaltraffic'] = 0;
+	$sessionsData['totaltrafficin'] = 0;
+	$sessionsData['totaltrafficout'] = 0;
+
+	$sessionsRPC = $exd->send('sessions');
+	foreach($sessionsRPC as $session){
+		$sessionObj = new Session($session);
+		$sessionsData['totaltraffic'] += $sessionObj->traffic;
+		$sessionsData['totaltrafficin'] += $sessionObj->trafficIn;
+		$sessionsData['totaltrafficout'] += $sessionObj->trafficOut;
+		$sessionsData['sessions'][] = $sessionObj;
 	}
-    
-    // Check if peers or sessions
-    if($sessionsB){
-        $sessionsInfo = $exd->send('sessions');
-    }else{
-        $sessionsInfo = $exd->send('peers');
-    }
 
-    if($geo){
-        if($sessionsB){
-            $sessions = createSessionsGeo($sessionsInfo);
-        }else{
-            $sessions = createPeersGeo($sessionsInfo);
-        }
-    }else{
-        if($sessionsB){
-            $sessions = createSessions($sessionsInfo);
-        }else{
-            $sessions = createPeers($sessionsInfo);
-        }
-    }
-    
-    return $sessions;
+	return $sessionsData;
 }
 
-// For sessions (non-geo)
-function createSessions($sessionsInfo){
-	global $traffic, $trafficIn, $trafficOut;
-	
-	foreach($sessionsInfo as $session){
-        $sessionObj = new Session($session);
-        $traffic += $sessionObj->traffic;
-        $trafficIn += $sessionObj->trafficIn;
-        $trafficOut += $sessionObj->trafficOut;
-		$sessions[] = $sessionObj;
+function getPeersData(bool $geo = NULL) {
+	global $exd;
 
+	$peersRPC = $exd->send('peers');
+	foreach($peersRPC as $peer){       
+		if(!empty($peer['ip_addr'])){
+				$peerObj = new Peer($peer);
+				$peersData['peers'][] = $peerObj;
+		}
 	}
-	return $sessions;
+	return $peersData;
 }
 
-// For peers (non-geo)
-function createPeers($peersInfo){
-	
-	foreach($peersInfo as $peer){       
-        if(!empty($peer['ip_addr'])){
-            $peerObj = new Peer($peer);
-            $peers[] = $peerObj;
-        }
-	}
-	return $peers;
-}
+// 	// If not set, use config setting
+// 	if(is_null($geo)){
+// 		$geo = CONFIG::PEERS_GEO;
+// 	}
+
 
 // For sessions (geo)
 function createSessionsGeo($peerinfo){
 	global $countryList;
-	global $traffic, $trafficIn, $trafficOut;
 	global $hosterC;
 	global $privateC;
-    global $newSessionsC;
 	
 	$noGeoData = false;
 	

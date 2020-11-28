@@ -167,7 +167,7 @@ class Rule {
 		
 		$node = new Node();
 		
-		$data['sessions'] = getSessionsData(true, false);
+		$data['sessions'] = getSessionsData(false)['sessions'];
 		$data['rules'] = self::getRules();
 		$data['global']['connections'] = $node->sessionsC;
 		$data['global']['traffic'] = $node->traffic;

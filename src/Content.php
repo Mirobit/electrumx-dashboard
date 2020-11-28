@@ -3,56 +3,45 @@
 namespace App;
 
 function createMainContent(){
-	global $trafficIn, $trafficOut, $newSessionsC;
-
-	$sessions = getSessionsData();
-
+	$sessionsData = getSessionsData();
 	$content['node'] = new Node();
 	if(Config::PEERS_GEO){
 		$content['map'] = createMapJs($content['node']->sessionsC);
 	}
 	$content['geo'] = Config::PEERS_GEO;
-    $content['sessionsnew'] = $newSessionsC;
-    $content['chartdata'] = getTopClients($sessions);
+  $content['chartdata'] = getTopClients($sessionsData['sessions']);
+	$content['totaltrafficin'] = $sessionsData['totaltrafficin'];
+	$content['totaltrafficout'] = $sessionsData['totaltrafficout'];
 
-	// Sessions traffic
-	$content['trafin'] = $trafficIn;
-	$content['trafcout'] = $trafficOut;
-
-    return $content;
-    
+  return $content;
 }
 
 function createSessionsContent(){
-	global $traffic, $trafficIn, $trafficOut, $newSessionsC;
+  $sessionsData = getSessionsData();
 
-    $sessions = getSessionsData();
-
-    $content['mostpop'] = getMostPop($sessions);
-    $content['sessions'] = $sessions;
-    $content['sessionsc'] = count($sessions);
-    $content['sessionsnewc'] = $newSessionsC;
-    $content['mostpop']['sslp'] = round($content['mostpop']['sslc']/$content['sessionsc'],2)*100;
-    $content['traffic'] = round($traffic,1);
-	$content['trafficin'] = $trafficIn;
-    $content['trafficinp'] = round($trafficIn/$traffic,2)*100;
-	$content['trafficout'] = $trafficOut;
+  $content['details'] = getMostPop($sessionsData['sessions']);
+  $content['sessions'] = $sessionsData['sessions'];
+  $content['sessionsc'] = count($sessionsData['sessions']);
+	$content['details']['sslp'] = round($content['details']['sslc']/$content['sessionsc'],2)*100;
+	$content['totaltraffic'] = $sessionsData['totaltraffic'];
+	$content['totaltrafficin'] = $sessionsData['totaltrafficin'];
+	$content['totaltrafficout'] = $sessionsData['totaltrafficout'];
+	$content['totaltrafficinper'] = round($sessionsData['totaltrafficin']/$sessionsData['totaltraffic'],2)*100;
 	$content['geo'] = Config::PEERS_GEO;
 
-    return $content;
+  return $content;
 }
 
 function createPeersContent(){
+    $peersData = getPeersData();
 
-    $peers = getSessionsData(false);
-
-    $content['mostpop'] = getMostPop($peers, false);
-    $content['peers'] = $peers;
-    $content['peersc'] = count($peers);
-    $content['mostpop']['sslp'] = round($content['mostpop']['sslc']/$content['peersc'],2)*100;
-    $content['mostpop']['tcpp'] = round($content['mostpop']['tcpc']/$content['peersc'],2)*100;
-    $content['mostpop']['torp'] = round($content['mostpop']['torc']/$content['peersc'],2)*100;
-	$content['geo'] = Config::PEERS_GEO;
+    $content['details'] = getMostPop($peersData['peers'], false);
+    $content['peers'] = $peersData['peers'];
+    $content['peersc'] = count($peersData['peers']);
+    $content['details']['sslp'] = round($content['details']['sslc']/$content['peersc'],2)*100;
+    $content['details']['tcpp'] = round($content['details']['tcpc']/$content['peersc'],2)*100;
+    $content['details']['torp'] = round($content['details']['torc']/$content['peersc'],2)*100;
+		$content['geo'] = Config::PEERS_GEO;
 
     return $content;
 }

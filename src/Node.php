@@ -15,10 +15,6 @@ class Node {
     public $errorsC;
     public $peers;
 	public $uptime;
-    public $trafficTotal;
-    public $trafficIn;
-    public $trafficOut;
-
 	
 	function __construct() {
 		global $exd;
@@ -36,8 +32,9 @@ class Node {
         
         $this->groupsC = checkInt($info['groups']);
         $this->peersC = checkInt($info['peers']['total']);
+        $this->requestsC = checkInt($info['request total']);
         $this->sessionsC = checkInt($info['sessions']['count']);
-        $this->subscriptionsC = checkInt($info['sessions']['subs']);
+        $this->subscriberC = checkInt($info['sessions']['count with subs']);
         $this->txSentC = checkInt($info['txs sent']);
         $this->errorsC = checkInt($info['sessions']['errors']);
         $this->uptime = htmlspecialchars($info['uptime']);

@@ -24,7 +24,7 @@ class Config {
     // Peer geo data is stored as long as the peers are connected. A page reload (main/peers/sessions) only
     // causes an API request if new peers connected (older than 5 minutes) since the last load. Up to
     // 100 ips/peers are checked per request.
-    const PEERS_GEO = TRUE;
+    const PEERS_GEO = FALSE;
     // Maxmim of seconds to wait for response from ip-api.com
     const PEERS_GEO_TIMEOUT = 2;
 }

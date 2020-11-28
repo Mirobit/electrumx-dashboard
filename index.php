@@ -71,10 +71,6 @@ require_once 'src/Content.php';
 // Globals
 $error = "";
 $message = "";
-$traffic = 0;
-$trafficIn = 0;
-$trafficOut = 0;
-$newSessionsC = 0;
 
 try {
     $exd = new RPC(Config::RPC_IP, Config::RPC_PORT);

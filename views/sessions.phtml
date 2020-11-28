@@ -3,36 +3,36 @@
             <div class="panel-body">
                 <div class="row tile_count">
                     <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                      <span class="count_top"><i class="fa fa-user"></i> Total Sessions</span>
+                      <span class="count_top"><i class="fa fa-user"></i> Sessions</span>
                       <div class="count"><?= $content['sessionsc'] ?></div>
-                      <span class="count_bottom"><i class="fa fa-envelope-o"></i><?= $content['mostpop']['subscribersc'] ?> <?= "Subscribers (".$content['mostpop']['txsc']." TX send)" ?></span>
+                      <span class="count_bottom"><i class="fa fa-envelope-o"></i><?= $content['details']['subscribersc'] ?> <?= "Subscribers" ?></span>
                     </div>
-                    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                      <span class="count_top"><i class="fa fa-star" style="color:#EDDA74;"></i> Most Popular Client Version</span>
-                      <div class="count"><?= $content['mostpop']['mpCli'] ?></div>
-                      <span class="count_bottom"><i class="fa fa-user-o"></i><?= $content['mostpop']['mpCliC'] ?> Sessions</span>
+                    <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
+                      <span class="count_top"><i class="fa fa-star"></i> Most Popular Client Version</span>
+                      <div class="count"><?= $content['details']['mpCli'] ?></div>
+                      <span class="count_bottom"><i class="fa fa-user-o"></i><?= $content['details']['mpCliC'] ?> Sessions</span>
                     </div>
                       <?php if($content['geo']){ ?>
                     <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
                       <span class="count_top"><i class="fa fa-globe blue"></i> Most Popular Country</span>
-                      <div class="count"><?= $content['mostpop']['mpCou'] ?></div>
-                      <span class="count_bottom"><i class="fa fa-user-o"></i><?= $content['mostpop']['mpCouC'] ?> Sessions</span>
+                      <div class="count"><?= $content['details']['mpCou'] ?></div>
+                      <span class="count_bottom"><i class="fa fa-user-o"></i><?= $content['details']['mpCouC'] ?> Sessions</span>
                     </div>
                     <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
                       <span class="count_top"><i class="fa fa-server" style="color:orange;"></i> Most Popular ISP</span>
-                      <div class="count"><?= $content['mostpop']['mpIsp'] ?></div>
-                      <span class="count_bottom"><i class="fa fa-user-o"></i><?= $content['mostpop']['mpIspC'] ?> Sessions</span>
+                      <div class="count"><?= $content['details']['mpIsp'] ?></div>
+                      <span class="count_bottom"><i class="fa fa-user-o"></i><?= $content['details']['mpIspC'] ?> Sessions</span>
                     </div>
                     <?php } ?>
                     <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
                       <span class="count_top"><i class="fa fa-hourglass-start"></i> SSL Connections</span>
-                      <div class="count"><?= $content['mostpop']['sslp'] ?><small> %</small></div>
-                      <span class="count_bottom"><i class="fa fa-user-o"></i><span><?= $content['mostpop']['sslc'] ?></span> Sessions</span>
+                      <div class="count"><?= $content['details']['sslp'] ?><small> %</small></div>
+                      <span class="count_bottom"><i class="fa fa-user-o"></i><span><?= $content['details']['sslc'] ?></span> Sessions</span>
                     </div>
                     <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                      <span class="count_top"><i class="fa fa-cloud" style="color:lightblue;"></i> Total Traffic</span>
-                      <div class="count"><?= ($content['traffic'] >= 1000) ? round($content['traffic']/1000,1)." <small>GB</small>" : round($content['traffic'],1)." <small>MB</small>"?></div>
-                      <span class="count_bottom"><i class="fa fa-cloud-upload"></i> <?= $content['trafficinp'] ?>% upload</span>
+                      <span class="count_top"><i class="fa fa-cloud"></i> Traffic <?= ($content['totaltraffic'] >= 1000) ? "(GB)" : "(MB)"?></span>
+                      <div class="count"><?= ($content['totaltraffic'] >= 1000) ? round($content['totaltraffic']/1000,1)." <small>GB</small>" : round($content['totaltraffic'],1)." <small>MB</small>"?></div>
+                      <span class="count_bottom"><i class="fa fa-cloud-upload" style="color:lightblue;"></i> <?= $content['totaltrafficinper'] ?>% upload</span>
                     </div>
                   </div>
                   </div>

@@ -3,30 +3,30 @@
             <div class="panel-body">          
 				<div class="row tile_count">
 					<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-					  <span class="count_top"><i class="fa fa-user"></i> Total Sessions</span>
+					  <span class="count_top"><i class="fa fa-user"></i> Sessions</span>
 					  <div class="count"><?= $content['node']->sessionsC ?></div>
-					  <span class="count_bottom"><span class="green" ><i class="fa fa-plus"></i><?= $content['sessionsnew'] ?></span> New Sessions</span>
+					  <span class="count_bottom"><span class="green" ><i class="fa fa-plug"></i><?= $content['node']->subscriberC ?></span> Subscriber</span>
 					</div>
 					<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-					  <span class="count_top"><i class="fa fa-user fa-eye"></i> Subscriptions</span>
-					  <div class="count"><?= number_format($content['node']->subscriptionsC) ?></div>
+					  <span class="count_top"><i class="fa fa-user fa-eye"></i> Requests</span>
+					  <div class="count"><?= number_format($content['node']->requestsC) ?></div>
 					  <span class="count_bottom"><i class="green"><i class="fa fa-envelope-o"></i><?= $content['node']->txSentC ?></i> TXs send</span>
 					</div>                    
 					<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-					  <span class="count_top"><i class="fa fa-cloud-upload"></i> Total Upload Traffic</span>
-					  <div class="count"><?= ($content['trafcout'] >= 1000) ? round($content['node']->tOut/1000,2)." <small>GB</small>" : $content['trafcout']." <small>MB</small>"?></div>					  
+					  <span class="count_top"><i class="fa fa-cloud-upload"></i> Upload Traffic <?= ($content['totaltrafficout'] >= 1000) ? "(GB)" : "(MB)"?></span>
+					  <div class="count"><?= ($content['totaltrafficout'] >= 1000) ? round($content['totaltrafficout']/1000,1) : round($content['totaltrafficout'], 1)?></div>					  
 					</div>
 					<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-					  <span class="count_top"><i class="fa fa-cloud-download"></i> Total Download Traffic</span>
-					  <div class="count"><?= ($content['trafin'] >= 1000) ? round($content['node']->tIn/1000,2)." <small>GB</small>" : $content['trafin']." <small>MB</small>"?></div>
+          <span class="count_top"><i class="fa fa-cloud-upload"></i> Download Traffic <?= ($content['totaltrafficin'] >= 1000) ? "(GB)" : "(MB)"?></span>
+					  <div class="count"><?= ($content['totaltrafficin'] >= 1000) ? round($content['totaltrafficin']/1000,1) : round($content['totaltrafficin'], 1)?></div>
 					</div>
-                    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+          <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
 					  <span class="count_top"><i class="fa fa-cube"></i> Block Height</span>
 					  <div class="count"><?= number_format($content['node']->blockHeight) ?></div>
 					 <span class="count_bottom"><?= ($content['node']->synced) ? " <i class='green'>synced</i>" : $content['node']->blocksBehind." behind"?></span>
 					</div>                    
 					<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-					  <span class="count_top"><i class="fa fa-server"></i> Peers (Servers)</span>
+					  <span class="count_top"><i class="fa fa-server"></i> Peers</span>
 					  <div class="count"><?= number_format($content['node']->peersC) ?></div>
 					  <span class="count_bottom"><i class="green"><i class="fa fa-clock-o"></i><?= $content['node']->uptime ?></i> online</span>
 					</div>					
