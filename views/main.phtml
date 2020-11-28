@@ -23,7 +23,7 @@
           <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
 					  <span class="count_top"><i class="fa fa-cube"></i> Block Height</span>
 					  <div class="count"><?= number_format($content['node']->blockHeight) ?></div>
-					 <span class="count_bottom"><?= ($content['node']->synced) ? " <i class='green'>synced</i>" : $content['node']->blocksBehind." behind"?></span>
+					 <span class="count_bottom"><?= ($content['node']->synced) ? ' <span style="color:lightblue;" >synced</span>' : $content['node']->blocksBehind." behind"?></span>
 					</div>                    
 					<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
 					  <span class="count_top"><i class="fa fa-server"></i> Peers</span>
