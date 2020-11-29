@@ -12,18 +12,6 @@
                       <div class="count"><?= $content['details']['mpCli'] ?></div>
                       <span class="count_bottom"><i class="fa fa-user-o"></i><?= $content['details']['mpCliC'] ?> Sessions</span>
                     </div>
-                      <?php if($content['geo']){ ?>
-                    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                      <span class="count_top"><i class="fa fa-globe blue"></i> Most Popular Country</span>
-                      <div class="count"><?= $content['details']['mpCou'] ?></div>
-                      <span class="count_bottom"><i class="fa fa-user-o"></i><?= $content['details']['mpCouC'] ?> Sessions</span>
-                    </div>
-                    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                      <span class="count_top"><i class="fa fa-server" style="color:orange;"></i> Most Popular ISP</span>
-                      <div class="count"><?= $content['details']['mpIsp'] ?></div>
-                      <span class="count_bottom"><i class="fa fa-user-o"></i><?= $content['details']['mpIspC'] ?> Sessions</span>
-                    </div>
-                    <?php } ?>
                     <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
                       <span class="count_top"><i class="fa fa-lock"></i> SSL Connections</span>
                       <div class="count"><?= $content['details']['sslp'] ?><small> %</small></div>
@@ -32,8 +20,20 @@
                     <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
                       <span class="count_top"><i class="fa fa-cloud"></i> Traffic <?= ($content['totaltraffic'] >= 1000) ? "(GB)" : "(MB)"?></span>
                       <div class="count"><?= ($content['totaltraffic'] >= 1000) ? round($content['totaltraffic']/1000,1)." <small>GB</small>" : round($content['totaltraffic'],1)." <small>MB</small>"?></div>
-                      <span class="count_bottom"><i class="fa fa-cloud-upload" style="color:lightblue;"></i> <?= $content['totaltrafficinper'] ?>% upload</span>
+                      <span class="count_bottom"><i class="fa fa-cloud-upload" style="color:lightblue;"></i> <?= $content['totaltrafficinper'] ?>% Upload</span>
                     </div>
+                    <?php if($content['geo']){ ?>
+                      <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                        <span class="count_top"><i class="fa fa-globe blue"></i> Most Popular Country</span>
+                        <div class="count"><?= $content['details']['mpCou'] ?></div>
+                        <span class="count_bottom"><i class="fa fa-user-o"></i><?= $content['details']['mpCouC'] ?> Sessions</span>
+                      </div>
+                      <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                        <span class="count_top"><i class="fa fa-server" style="color:orange;"></i> Most Popular ISP</span>
+                        <div class="count"><?= $content['details']['mpIsp'] ?></div>
+                        <span class="count_bottom"><i class="fa fa-user-o"></i><?= $content['details']['mpIspC'] ?> Sessions</span>
+                      </div>
+                    <?php } ?>
                   </div>
                   </div>
              </div>

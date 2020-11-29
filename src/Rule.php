@@ -163,8 +163,7 @@ class Rule {
     }
 	
 	// Gets information needed for rule run
-	private static function getData(){
-		
+	private static function getData(){	
 		$node = new Node();
 		
 		$data['sessions'] = getSessionsData(false)['sessions'];
