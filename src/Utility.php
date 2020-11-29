@@ -121,27 +121,6 @@ function getDateTime($timestamp){
 	return $date;
 }
 
-function getCleanClient($client){
-	$client =  ltrim($client,"/");
-	$client =  rtrim($client,"/");
-	
-	if(preg_match("/^Satoshi:([0]\.[0-9]{1,2}\.[0-9]{1,2})/",$client, $matches)) {
-		$client = "Core ".$matches[1];
-	}elseif(preg_match("/^Satoshi:([1]\.[0-9]{1,2}\.[0-9]{1,2})/",$client, $matches)) {
-		$client = "btc1 ".$matches[1];
-	}elseif(preg_match("/MultiBitHD:([0-9]\.[0-9]{1,2}\.[0-9]{1,2})/i",$client, $matches)){
-		$client = "MultiBit HD ".$matches[1];
-	}elseif(preg_match("/MultiBit:([0-9]\.[0-9]{1,2}\.[0-9]{1,2})/i",$client, $matches)){
-		$client = "MultiBit ".$matches[1];
-	}elseif(preg_match("/Bitcoin Wallet:([0-9]\.[0-9]{1,2})/i",$client, $matches)){
-		$client = "Bitcoin Wallet ".$matches[1];
-	}else{
-		$replace = array(":", "-SNAPSHOT", "\"", "'", "<", ">", "=");
-		$client = str_replace($replace, " ", $client);
-	}
-	return $client;
-}
-
 
 // Creates chart and legend (list)
 function getTopClients($sessions){
@@ -150,10 +129,10 @@ function getTopClients($sessions){
   $chartValue = ""; 
     
   foreach($sessions as $session){
-      if(isset($clients["Electrum ".$session->client])){
-        $clients["Electrum ".$session->client]['count']++;
+      if(isset($clients[$session->client])){
+        $clients[$session->client]['count']++;
       }else{
-          $clients["Electrum ".$session->client]['count'] = 1;
+          $clients[$session->client]['count'] = 1;
       }
   }
     
