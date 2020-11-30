@@ -1,6 +1,6 @@
 # ElectrumX Dashboard
 
-![](https://i.imgur.com/TU8tpXK.png)
+![](https://user-images.githubusercontent.com/13236924/100623563-9d8b7880-3322-11eb-9da2-5083d28cefbd.png)
 
 ElectrumX Dashboard (EXD) is a lightweight dashboard for [ElectrumX](https://github.com/spesmilo/electrumx) servers.
 
