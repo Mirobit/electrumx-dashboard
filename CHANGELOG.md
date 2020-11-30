@@ -1,14 +1,14 @@
-#ElectrumX Dashboard Changelog
+# ElectrumX Dashboard Changelog
 
 ## 1.0.0 - 2020-11-30
 
-This is a major update and breaks compatibility. You have to delete `data/geodatasessions.inc`, `data/geodatapeers.inc` and use the new `src\Config.php.example` (copy and remove `example`).
+This is a major update and breaks compatibility. You have to delete `data/geodatasessions.inc`, `data/geodatapeers.inc` and use the new `src\Config.php.example` (copy and remove `.example` from the name).
 
-- [**New**] Seperate setting for peers and sessions geo data
+- [**New**] Seperate setting for peers and sessions for geo data
 - [**New**] On the main, sessions and peers page is on the upper right a small refresh icon with info if Geo API calls were made
 - [**Improved**] Modern favicon
 - [**Improved**] More useful top information cards
-- [**Improved**] Refactored large parts of the code base
+- [**Improved**] Refactored parts of the code base
 - [**Improved**] Layout and styling improvments
 - [**Improved**] Updated hoster detection list
 - [**Fixed**] Compatibility with latest ElectrumX
