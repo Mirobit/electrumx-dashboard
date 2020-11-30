@@ -9,7 +9,6 @@ class Template {
         $this->section = $data['section'];
         $this->sectionPath = "views/".$this->section.".phtml";
         $this->data = $data;
-        //print_r($data);
     }
 
     public function render() {

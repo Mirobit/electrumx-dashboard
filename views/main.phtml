@@ -67,16 +67,17 @@
                       <td>
                         <table class="countries_list">
 						
-                        <?php $i = 1;
+                        <?php
+                        $i = 1;
                         foreach($content['chartdata']['legend'] as $cName => $client){
                         ?>
-							<tr>
-								<td><?= $i ?>. <?= $cName ?></td><td style="padding-right:0px;padding-left:0px;"><small>(<?= $client['share'] ?>%)</small></td>
-							</tr>
-                        <?php 
-							$i++; 
-							} 
-						?>                         
+                          <tr>
+                            <td style="padding-left:0px;padding-right:0px;"><?= $i ?>.</td><td style="padding-left:0px;padding-right:0px;"><?= $cName ?></td><td style="padding-right:0px;"><?= $client['count'] ?></td><td style="padding-right:0px;padding-left:0px;"><small>(<?= $client['share'] ?>%)</small></td>
+                          </tr>
+                          <?php 
+                          $i++; 
+                        } 
+                        ?>                         
                         </table>
                       </td>
                     </tr>
@@ -93,9 +94,8 @@
                   <h2>Global Sessions Distribution</h2>
                   <ul class="nav navbar-right panel_toolbox">
                     <li><a class="close-link"><i class="fa fa-close"></i></a>
-                    </li><li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                    </li>
-
+                    </li><li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                    <?php if(isset($content['api'])) { ?><li><a><i class="fa fa-refresh" data-toggle="tooltip" data-html="true" data-placement="left" title="<?= $content["api"]["callc"] ?> call(s) to API with <?= $content["api"]["ipc"] ?> new ips."></i></a></li><?php }?>
                   </ul>
                   <div class="clearfix"></div>
                 </div>
@@ -107,13 +107,13 @@
                         <?php $i = 1;
                         foreach($content['map']['desc'] as $cName => $country){
                         ?>
-							<tr>
-								<td style="padding-right:0px;width:33px"><?= $i ?>.</td><td style="padding-left:0px;padding-right:0px;width:32px"><img src="assets/images/flags/16/<?= $cName ?>.png" /></td><td style="padding-left:2px;"> <?= $cName ?></td><td style="padding-right:0px;width:35px"><?= $country['count'] ?></td><td style="padding-left:0px;padding-right:0px;width:45px">(<?= $country['share'] ?>%)</td>                                     
-							</tr>
+                        <tr>
+                          <td style="padding-right:0px;padding-left:0px;"><?= $i ?>.</td><td style="padding-left:0px;padding-right:0px;"><img src="assets/images/flags/16/<?= $cName ?>.png" /></td><td style="padding-left:0px;padding-right:0px;"> <?= $cName ?></td><td style="padding-right:0px;padding-left:0px;"><?= $country['count'] ?></td><td style="padding-left:0px;padding-right:0px;"><small>(<?= $country['share'] ?>%)<small></td>                                     
+                        </tr>
                         <?php 
-							$i++; 
-						} 
-						?>
+                        $i++; 
+                        } 
+                        ?>
                         </tbody>
                       </table>
                     </div>

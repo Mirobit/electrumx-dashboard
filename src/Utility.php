@@ -84,7 +84,7 @@ function checkCountryCode($countryCode){
 
 function checkString($string){
 	$string = substr($string,0,50);
-	if(preg_match("/^[0-9a-zA-Z- \.,&]{2,50}$/",$string)){
+	if(preg_match("/^[0-9a-zA-Z- ()\/\.,&]{2,50}$/",$string)){
 		return $string;
 	}else{
 		return "Unknown";
@@ -101,7 +101,7 @@ function checkHosted($hoster){
 }
 
 function updateHosted($hoster, $hosted){
-    $peers = file_get_contents('data/geodatasessions.inc');
+  $peers = file_get_contents('data/geodatasessions.inc');
 	$peers = unserialize($peers);
     foreach($peers as &$peer){
         if ($peer[5] == $hoster){
@@ -143,12 +143,12 @@ function getTopClients($sessions){
   if($clientCount > 9){
     $clients['Other']['count'] = $clientCount-9;
   }
-	
-    
+ 
   foreach($clients as $cName => &$client){
     $chartLabels .= '"'.$cName.'",';
     $chartValue .= $client['count'].',';
-		$client['share'] = round($client['count']/$peerCount,2)*100;
+    $client['share'] = round($client['count']/$peerCount,2)*100;
+    if($client['share'] === 0) $client['share'] = 1;
   }
     
   $chartData['labels'] = rtrim($chartLabels, ",");
@@ -160,9 +160,9 @@ function getTopClients($sessions){
 
 
 function getMostPop(array $connections, bool $sessionsB = true){
-    $clCountAr = [];
-    $ctCountAr = [];
-    $htCountAr = [];
+    $clientCountAr = [];
+    $countryCountAr = [];
+    $ispCountAr = [];
     $ipCountAr = [];
     $result = [];
     $result['sslc'] = 0;
@@ -182,7 +182,7 @@ function getMostPop(array $connections, bool $sessionsB = true){
             if($connection->subscriptionsC > 0){
                 $result['subscribersc']++;
             }  
-            // Sum all txs send
+            // Count txs send
             $result['txsc'] += $connection->txsC;
         }else{
 					// Count good peers
@@ -197,33 +197,35 @@ function getMostPop(array $connections, bool $sessionsB = true){
 					}	
 				}
         
-        // Count different IPs
+        // Group different ips
          if(array_key_exists($connection->ip, $ipCountAr)){
             $ipCountAr[$connection->ip]++;
         }else{
             $ipCountAr[$connection->ip] = 1;
         }
         
-        // Count Client 1
-        if(array_key_exists($connection->client, $clCountAr)){
-            $clCountAr[$connection->client]++;
+        // Count Clients
+        if(array_key_exists($connection->client, $clientCountAr)){
+            $clientCountAr[$connection->client]++;
         }else{
-            $clCountAr[$connection->client] = 1;
+            $clientCountAr[$connection->client] = 1;
         }
         
-        if(CONFIG::PEERS_GEO){
-            // Count Country 1
-            if(array_key_exists($connection->countryCode, $ctCountAr)){
-                $ctCountAr[$connection->countryCode]++;
+        if(($sessionsB AND CONFIG::SESSIONS_GEO) or (!$sessionsB AND CONFIG::PEERS_GEO)){
+            // Check if unknown or new
+            if($connection->countryCode === "UN" OR $connection->countryCode === "NX") continue;
+            // Count Countries
+            if(array_key_exists($connection->countryCode, $countryCountAr)){
+                $countryCountAr[$connection->countryCode]++;
             }else{
-                $ctCountAr[$connection->countryCode] = 1;
+                $countryCountAr[$connection->countryCode] = 1;
             }
             
-            // Count ISP 1
-            if(array_key_exists($connection->isp, $htCountAr)){
-                $htCountAr[$connection->isp]++;
+            // Count ISPs
+            if(array_key_exists($connection->isp, $ispCountAr)){
+                $ispCountAr[$connection->isp]++;
             }else{
-                $htCountAr[$connection->isp] = 1;
+                $ispCountAr[$connection->isp] = 1;
             }            
         }
     }
@@ -231,21 +233,21 @@ function getMostPop(array $connections, bool $sessionsB = true){
     // Count different IPs
     $result['ips'] = count($ipCountAr);
     
-    // Count Client 2
-    arsort($clCountAr);
-    $result['mpCli'] = key($clCountAr);
-    $result['mpCliC'] = reset($clCountAr);
+    // Select most popular client
+    arsort($clientCountAr);
+    $result['mpCli'] = key($clientCountAr);
+    $result['mpCliC'] = reset($clientCountAr);
     
-    if(CONFIG::PEERS_GEO){
-        // Count Country 2
-        arsort($ctCountAr);
-        $result['mpCou'] = key($ctCountAr);
-        $result['mpCouC'] = reset($ctCountAr);
+    if(($sessionsB AND CONFIG::SESSIONS_GEO) or (!$sessionsB AND CONFIG::PEERS_GEO)){
+        // Select most popular clountry
+        arsort($countryCountAr);
+        $result['mpCou'] = key($countryCountAr);
+        $result['mpCouC'] = reset($countryCountAr);
         
-        // Count ISP 2
-        arsort($htCountAr);
-        $result['mpIsp'] = substr(key($htCountAr),0,8);
-        $result['mpIspC'] = reset($htCountAr);
+        // Select most popular isp
+        arsort($ispCountAr);
+        $result['mpIsp'] = substr(key($ispCountAr),0,8);
+        $result['mpIspC'] = reset($ispCountAr);
     }
     
     return $result;
@@ -253,134 +255,145 @@ function getMostPop(array $connections, bool $sessionsB = true){
 
 
 
-function getSessionsData(bool $geo = NULL) {
+function getSessionsData(bool $geo = CONFIG::SESSIONS_GEO) {
 	global $exd;
-	$sessionsData['totaltraffic'] = 0;
-	$sessionsData['totaltrafficin'] = 0;
-	$sessionsData['totaltrafficout'] = 0;
-
-	$sessionsRPC = $exd->send('sessions');
-	foreach($sessionsRPC as $session){
-		$sessionObj = new Session($session);
-		$sessionsData['totaltraffic'] += $sessionObj->traffic;
-		$sessionsData['totaltrafficin'] += $sessionObj->trafficIn;
-		$sessionsData['totaltrafficout'] += $sessionObj->trafficOut;
-		$sessionsData['sessions'][] = $sessionObj;
-	}
+  $sessionsData = [];
+  $sessionsRPC = $exd->send('sessions');
+  
+  if($geo){
+    $geoData = getSessionsGeoData($sessionsRPC);
+    $sessionsData = $geoData;
+  }else{
+    $sessionsData['totaltraffic'] = 0;
+    $sessionsData['totaltrafficin'] = 0;
+    $sessionsData['totaltrafficout'] = 0;
+    foreach($sessionsRPC as $session){
+      $sessionObj = new Session($session);
+      $sessionsData['totaltraffic'] += $sessionObj->traffic;
+      $sessionsData['totaltrafficin'] += $sessionObj->trafficIn;
+      $sessionsData['totaltrafficout'] += $sessionObj->trafficOut;
+      $sessionsData['sessions'][] = $sessionObj;
+    }
+  }
 
 	return $sessionsData;
 }
 
-function getPeersData(bool $geo = NULL) {
-	global $exd;
+function getPeersData(bool $geo = CONFIG::PEERS_GEO) {
+  global $exd;
+  $peersData = [];
+  $peersRPC = $exd->send('peers');
+  
+  if($geo){
+    $geoData = getPeersGeoData($peersRPC);
+    $peersData['peers'] = $geoData['peers'];
+  }else{
+    foreach($peersRPC as $peer){       
+      if(!empty($peer['ip_addr'])){
+          $peersData['peers'][] = new Peer($peer);
+      }
+    }
+  }
 
-	$peersRPC = $exd->send('peers');
-	foreach($peersRPC as $peer){       
-		if(!empty($peer['ip_addr'])){
-				$peerObj = new Peer($peer);
-				$peersData['peers'][] = $peerObj;
-		}
-	}
 	return $peersData;
 }
 
-// 	// If not set, use config setting
-// 	if(is_null($geo)){
-// 		$geo = CONFIG::PEERS_GEO;
-// 	}
-
 
 // For sessions (geo)
-function createSessionsGeo($peerinfo){
-	global $countryList;
-	global $hosterC;
-	global $privateC;
-	
-	$noGeoData = false;
-	
-	// Check if peer file exists and enabled
+function getSessionsGeoData($sessionsRPC){
+	$countryList = [];
+	$hosterC = 0;
+  $privateC = 0;
+  $newSessionsC = 0;
+  $noGeoData = false;
+  $sessionData['totaltraffic'] = 0;
+  $sessionData['totaltrafficin'] = 0;
+  $sessionData['totaltrafficout'] = 0;
+
+	// Check if session file exists and enabled
 	if (file_exists('data/geodatasessions.inc')){
-		// Loads serialized stored peers from disk
-		$serializedPeers = file_get_contents('data/geodatasessions.inc');
-		$arrayPeers = unserialize($serializedPeers);
+		// Loads serialized stored sessions from disk
+		$serializedSessions = file_get_contents('data/geodatasessions.inc');
+		$arraySessions = unserialize($serializedSessions);
 		// Check if client was restarted and IDs reassigned
-		$oldestPeerId = reset($peerinfo)[0];
-		$oldestPeerIp = getCleanIP(reset($peerinfo)[2]);
+		$oldestSessionId = reset($sessionsRPC)[0];
+		$oldestSessionIp = getCleanIP(reset($sessionsRPC)[2]);
 		$delete = false;
-		// Checks if we know about the oldest peer, if not we assume that we don't known any peer
-		foreach($arrayPeers as $key => $peer){
-			if($oldestPeerIp == $peer[0]){
+		// Checks if we know about the oldest sessions, if not we assume that we don't known any session
+		foreach($arraySessions as $key => $session){
+			if($oldestSessionIp == $session[0]){
 				$delete = true;
-				// Either bitcoind was restarted or peer reconnected. Since peer is the oldest, all other peers we known disconnected
-				if($oldestPeerId != $key){
+				// Either ElectrumX was restarted or sessions reconnected. Since session is the oldest, all other sessions we known disconnected
+				if($oldestSessionId != $key){
 					$delete = false;
 				}
 				break;
 			}
-			// For removing old peers that disconnected. Value of all peers that are still conected will be changed to 1 later. All peers with 0 at the end of the function will be deleted.
-			$arrayPeers[$key][7] = 0;
+			// For removing old sessions that disconnected. Value of all sessions that are still conected will be changed to 1 later. All sessions with 0 at the end of the function will be deleted
+			$arraySessions[$key][7] = 0;
 		}
-		// Oldest peer hasn't shown up -> Node isn't connected to any of the previously stored peers
+		// Oldest session hasn't shown up -> Node isn't connected to any of the previously stored sessions
 		if(!$delete){
-			unset($arrayPeers);
+			unset($arraySessions);
 			$noGeoData = true;
 		}
 	}else{
 		$noGeoData = true;
 	}
 	
-	// Find Ips that we don't have geo data for and that are "older" than 2 minutes
-    // First interation through all peers is used to collect ips for geo api call. This way the batch functionality can be used
-	$ips = [];
-	foreach($peerinfo as &$peer){
-		$tempIP = getCleanIP($peer[2]);
-        // Older than 5 minutes (180s)
-		if ($peer[12] > 300 AND ($noGeoData OR !in_array($tempIP,array_column($arrayPeers,0)))){
+	// Find sessions that we don't have geo data for and that are "older" than 10 minutes
+  // First interation through all sessions is used to collect ips for geo api call. This way the batch functionality can be used
+  $ips = [];
+  $ipData = [];
+
+	foreach($sessionsRPC as $session){
+		$tempIP = getCleanIP($session[2]);
+    // Older than 10 minutes
+		if ($session[14] > 600 AND ($noGeoData OR !in_array($tempIP,array_column($arraySessions,0)))){
 			$ips[] = $tempIP;
 		}
 	}
-	unset($peer);
 	
 	if(!empty($ips)){
-		$ipData = getIpData($ips);
-	}
-    // 2nd interation through peers to create final peer list for output
-	foreach($peerinfo as $session){
-		// Creates new peer object
-		$peerObj = new Session($session);
+    $apiData = getIpData($ips);
+    $ipData = $apiData['geojson'];
+    $sessionData['api'] = $apiData['api'];
+  }
 
-		// Checks if peer is new or if we can read data from disk (geodatapeers.inc)
-		if($noGeoData OR !in_array($peerObj->ip,array_column($arrayPeers,0))){       
-			if(isset($ipData[0]) AND $peerObj->age > 300){              
-				$countryInfo = $ipData[array_search($peerObj->ip, array_column($ipData, 'query'))];
-				$countryCode = checkCountryCode($countryInfo['countryCode']);
-				$country = checkString($countryInfo['country']);
-				$region = checkString($countryInfo['regionName']);
-				$city = checkString($countryInfo['country']);
-				$isp = checkString($countryInfo['isp']);         
+  // 2nd interation through sessions to create final sessions list for output
+	foreach($sessionsRPC as $session){
+		// Creates new session object
+		$sessionObj = new Session($session);
+
+		// Checks if session is new or if we can read data from disk (geodatasessions.inc)
+		if($noGeoData OR !in_array($sessionObj->ip,array_column($arraySessions,0))){ 
+      $index = array_search($sessionObj->ip, array_column($ipData, 'query'));
+			if(isset($ipData[0]) AND $sessionObj->age > 600 AND is_numeric($index)){  
+        $ipInfo = $ipData[$index];            
+				$countryCode = checkCountryCode($ipInfo['countryCode']);
+				$country = checkString($ipInfo['country']);
+				$city = checkString($ipInfo['country']);
+				$isp = checkString($ipInfo['isp']);         
 				$hosted = checkHosted($isp);
                 
-				// Adds the new peer to the save list
-				$arrayPeers[$peerObj->id] = array($peerObj->ip, $countryCode, $country, $region, $city, $isp, $hosted, 1);
+				// Adds the new session to the save list
+				$arraySessions[$sessionObj->id] = array($sessionObj->ip, $countryCode, $country, $city, $isp, $hosted, 1);
                 
-                // Only counted for peers older than 5 minutes
-                $newSessionsC++;
-                
-			}elseif($peerObj->age > 300){
+			  // Only counted for sessions older than 10 minutes
+				$newSessionsC++;       
+			}elseif($sessionObj->age > 600){
 				// If IP-Api.com call failed we set all data to Unknown and don't store the data
 				$countryCode = "UN";
 				$country = "Unknown";
-				$region = "Unknown";
 				$city = "Unknown";
 				$isp = "Unknown";         
 				$hosted = false;
-                // Only counted for peers older than 5 minutes
-                $newSessionsC++;                
+        // Only counted for sessions older than 10 minutes
+        $newSessionsC++;                
 			}else{
-				// If peer is younger than 3 minutes
+				// If session is younger than 10 minutes
 				$countryCode = "NX";
 				$country = "New";
-				$region = "New";
 				$city = "New";
 				$isp = "New";         
 				$hosted = false;                
@@ -388,66 +401,71 @@ function createSessionsGeo($peerinfo){
             }
 
 		}else{
-			$id = $peerObj->id;
+			$id = $sessionObj->id;
 			// Nodes that we know about but reconnected
-			if(!isset($arrayPeers[$id])){
-				$id = array_search($peerObj->ip, array_column($arrayPeers,0));
-				$id = array_keys($arrayPeers)[$id];
+			if(!isset($arraySessions[$id])){
+				$id = array_search($sessionObj->ip, array_column($arraySessions,0));
+				$id = array_keys($arraySessions)[$id];
 			}
-			$countryCode = $arrayPeers[$id][1];
-			$country = $arrayPeers[$id][2];
-			$region = $arrayPeers[$id][3];
-			$city = $arrayPeers[$id][4];
-			$isp = $arrayPeers[$id][5];
-			$hosted = $arrayPeers[$id][6];
-			$arrayPeers[$id][7] = 1;
+			$countryCode = $arraySessions[$id][1];
+			$country = $arraySessions[$id][2];
+			$city = $arraySessions[$id][3];
+			$isp = $arraySessions[$id][4];
+			$hosted = $arraySessions[$id][5];
+			$arraySessions[$id][6] = 1;
 		}
 
-		// Counts the countries
-		if(isset($countryList[$country])){       
-			$countryList[$country]['count']++;
-		}else{
-            $countryList[$country]['code'] = $countryCode;
-			$countryList[$country]['count'] = 1;
-        }		
+    // Counts the countries
+    if($countryCode !== "UN" AND $countryCode !== "NX") {
+      if(isset($countryList[$country])){     
+        $countryList[$country]['count']++;
+      }else{
+        $countryList[$country]['code'] = $countryCode;
+        $countryList[$country]['count'] = 1;
+      }
+    }
 
-		// Adds country data to peer object
-		$peerObj->countryCode = $countryCode;
-		$peerObj->country = $country;
-		$peerObj->region = $region;
-		$peerObj->city = $city;
-		$peerObj->isp = $isp;
-		$peerObj->hosted = $hosted;
+		// Adds country data to session object
+		$sessionObj->countryCode = $countryCode;
+		$sessionObj->country = $country;
+		$sessionObj->city = $city;
+		$sessionObj->isp = $isp;
+		$sessionObj->hosted = $hosted;
 		if($hosted){
 			$hosterC++;
 		}else{
 			$privateC++;
 		}
-		// Adds traffic of each peer to total traffic (in MB)
-		$traffic += $peerObj->traffic;
-		$trafficIn += $peerObj->trafficIn;
-		$trafficOut += $peerObj->trafficOut;
+		// Adds traffic of each sessions to total traffic (in MB)
+		$sessionData['totaltraffic'] += $sessionObj->traffic;
+		$sessionData['totaltrafficin'] += $sessionObj->trafficIn;
+		$sessionData['totaltrafficout'] += $sessionObj->trafficOut;
 	
-		// Adds peer to peer array
-		$peers[] = $peerObj;
+		// Adds sessions to final sessions array
+    $sessionData['sessions'][] = $sessionObj;
+  }
+  
+  $sessionData['hosterc'] = $hosterC;
+  $sessionData['privatec'] = $privateC;
+  $sessionData['newsessionsc'] = $newSessionsC;
+  $sessionData['countrylist'] = $countryList;
 
-	}
-
-    // Removes all peers that the node is not connected to anymore.
-    foreach($arrayPeers as $key => $peer){
-        if($peer[7] == 0){
-            unset($arrayPeers[$key]);
-        }
+  // Removes all sessions that the node is not connected to anymore.
+  foreach($arraySessions as $key => $session){
+    if($session[6] == 0){
+      unset($arraySessions[$key]);
     }
+  }
 
-    $newSerializePeers = serialize($arrayPeers);
-    file_put_contents('data/geodatasessions.inc', $newSerializePeers);
-    
-    return $peers;
+  // Write update session data to file
+  $newSerializeSessions = serialize($arraySessions);
+  file_put_contents('data/geodatasessions.inc', $newSerializeSessions);
+  
+  return $sessionData;
 }
 
-// For Peers/servers
-function createPeersGeo($peersRPC){
+// For Peers
+function getPeersGeoData($peersRPC){
 	$noGeoData = false;
 	
 	// Check if peer file exists and enabled
@@ -460,90 +478,89 @@ function createPeersGeo($peersRPC){
 	}
 	
 	// Find hosts that we don't have geo data for
-    // First interation through all peers is used to collect hosts for geo api call. This way the batch functionality can be used
+  // First interation through all peers is used to collect ips for geo api call
 	$ips = [];
-	foreach($peersRPC as &$peer){
+	foreach($peersRPC as $peer){
 		$tempIp = $peer['ip_addr'];
 		if($noGeoData OR !isset($arrayPeers[$tempIp])){
-            // Don't query API for tor hosts
-            if(!empty($peer['ip_addr'])){
-                $ips[] = $tempIp;
-            }
+    	// Don't query API for tor hosts
+    	if(!empty($peer['ip_addr'])){
+    		$ips[] = $tempIp;
+      }
 		}
 	}
-	unset($peer);
 	
-    // Get inforamtion from ip-api.com
+  // Get inforamtion from ip-api.com
 	if(!empty($ips)){
-		$ipData = getIpData($ips);
+    $apiData = getIpData($ips);
+    $ipData = $apiData['geojson'];
+    $peerData['api'] = $apiData['api'];
 	}
     
-    // 2nd interation through peers to create final peer list for output
+  // 2nd interation through peers to create final peer list for output
 	foreach($peersRPC as $peer){
-        // Exlucde tor nodes
-        if(empty($peer['ip_addr'])){
-            continue;
-        }
+  	// Exlucde tor nodes
+    if(empty($peer['ip_addr'])){
+    	continue;
+    }
 		// Creates new peer object
 		$peerObj = new Peer($peer);
 
-
-        
-        // Check if peer is new or if we can read data from disk (geodatapeers.inc)
-        if(!isset($arrayPeers[$peerObj->ip])){
-            // Check if tor node or not                 
-            $countryInfo = $ipData[array_search($peerObj->ip, array_column($ipData, 'query'))];
-            $countryCode = checkCountryCode($countryInfo['countryCode']);
-            $country = checkString($countryInfo['country']);
-            $region = checkString($countryInfo['regionName']);
-            $city = checkString($countryInfo['country']);
-            $isp = checkString($countryInfo['isp']);         
-            // Adds the new peer to the save list		
-            $arrayPeers[$peerObj->ip] = array($peerObj->ip, $countryCode, $country, $region, $city, $isp, 1);          
-        }else{
+    // Check if peer is new or if we can read data from disk (geodatapeers.inc)
+		if(!isset($arrayPeers[$peerObj->ip])){
+      // Check if tor node or not
+			$ipInfo = $ipData[array_search($peerObj->ip, array_column($ipData, 'query'))];
+			$countryCode = checkCountryCode($ipInfo['countryCode']);
+			$country = checkString($ipInfo['country']);
+			$city = checkString($ipInfo['country']);
+			$isp = checkString($ipInfo['isp']);         
+			// Adds the new peer to the save list		
+			$arrayPeers[$peerObj->ip] = array($peerObj->ip, $countryCode, $country, $city, $isp, 1);          
+		}else{
 			$countryCode = $arrayPeers[$peerObj->ip][1];
 			$country = $arrayPeers[$peerObj->ip][2];
-			$region = $arrayPeers[$peerObj->ip][3];
-			$city = $arrayPeers[$peerObj->ip][4];
-			$isp = $arrayPeers[$peerObj->ip][5];
-            $arrayPeers[$peerObj->ip][6] = 1;
+			$city = $arrayPeers[$peerObj->ip][3];
+			$isp = $arrayPeers[$peerObj->ip][4];
+			$arrayPeers[$peerObj->ip][5] = 1;
 		}          
 
 		// Adds country data to peer object
 		$peerObj->countryCode = $countryCode;
 		$peerObj->country = $country;
-		$peerObj->region = $region;
 		$peerObj->city = $city;
 		$peerObj->isp = $isp;
 	
 		// Adds peer to peer array
-		$peers[] = $peerObj;
-	}
+    $peerData['peers'][] = $peerObj;
+  }
 
-    // Removes all peers that the node is not connected to anymore.
-    foreach($arrayPeers as $key => &$peer){
-        if($peer[6] == 0){
-            unset($arrayPeers[$key]);
-        }else{
-           $peer[6] = 0; 
-        }
-    }
+  // Removes all peers that the node is not connected to anymore.
+  foreach($arrayPeers as $key => &$peer){
+      if($peer[5] == 0){
+          unset($arrayPeers[$key]);
+      }else{
+          $peer[5] = 0; 
+      }
+  }
 
-    // Save geodata
-    $newSerializePeers = serialize($arrayPeers);
-    file_put_contents('data/geodatapeers.inc', $newSerializePeers);
-    
-    return $peers;
+  // Save geodata
+  $newSerializePeers = serialize($arrayPeers);
+  file_put_contents('data/geodatapeers.inc', $newSerializePeers);
+  
+  return $peerData;
 }
 
 function getIpData($ips){
 	global $error;
-	
+  $apiData['api']['callc'] = 0;
 	$numOfIps = count($ips);
-	// A maximum of 2000 IPs can be checked (theoratical limit by ip-api.com is 15000 per min (150 x 100) if batch requests are used)
-	if($numOfIps > 2000){
-		$numOfIps = 2000;
-	}	
+	// ip-api.com allows 15 requests with 100 ips per minute. Since peers and sessions are
+	// called seperatly, is the limit here lower than 1500.
+	if($numOfIps > 100){
+		$numOfIps = 100;
+  }
+
+  $apiData['api']['ipc'] = $numOfIps;
 	$j = 0;
 	// A mamxium of 100 Ips can be checked per API call (limit by ip-api.com)
 	$m = 100;
@@ -562,14 +579,15 @@ function getIpData($ips){
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); 
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 	curl_setopt($ch, CURLOPT_POST, true);
-	curl_setopt($ch, CURLOPT_URL,'http://ip-api.com/batch?fields=query,country,countryCode,regionName,city,isp,status');
+	curl_setopt($ch, CURLOPT_URL,'http://ip-api.com/batch?fields=query,country,countryCode,city,isp,status');
 	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
-	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT , CONFIG::PEERS_GEO_TIMEOUT); 
-	curl_setopt($ch, CURLOPT_TIMEOUT, CONFIG::PEERS_GEO_TIMEOUT+1);
+	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT , CONFIG::GEO_TIMEOUT); 
+	curl_setopt($ch, CURLOPT_TIMEOUT, CONFIG::GEO_TIMEOUT+1);
 	
 	// One call for each 100 ips
-	$geojsonraw = [];
+	$apiData['geojson'] = [];
 	foreach($postvars as $postvar){
+    $apiData['api']['callc']++;
 		$postvarJson = json_encode($postvar);
 		curl_setopt($ch,CURLOPT_POSTFIELDS, $postvarJson);
 		$result = json_decode(curl_exec($ch),true);
@@ -577,13 +595,13 @@ function getIpData($ips){
 			$error = "Geo API (ip-api.com) Timeout";
 			$result = [];
 		}
-		$geojsonraw = array_merge($geojsonraw, $result);
-	}
-	return $geojsonraw;
+		$apiData['geojson'] = array_merge($apiData['geojson'], $result);
+  }
+
+	return $apiData;
 }
 
-function createMapJs(int $peerCount){
-	global $countryList;
+function createMapJs(int $peerCount, array $countryList){
     
     // Sorting country list
     function compare($a, $b)
@@ -623,7 +641,7 @@ function createMapJs(int $peerCount){
 	$map['data'] = $jqvData;
 	$map['desc'] = $mapDesc;
 	
-    return $map;
+  return $map;
 }
 
 ?>

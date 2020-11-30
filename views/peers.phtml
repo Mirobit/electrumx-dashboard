@@ -7,23 +7,6 @@
                       <div class="count"><?= $content['peersc'] ?></div>
                       <span class="count_bottom"> <?= $content['details']['peersgc'] ?></span> Good</span>
                     </div>
-                    <div class="col-md-4 col-sm-4 col-xs-6 tile_stats_count">
-                      <span class="count_top"><i class="fa fa-star"></i> Most Popular Client Version</span>
-                      <div class="count"><?= $content['details']['mpCli'] ?></div>
-                      <span class="count_bottom"> <?= $content['details']['mpCliC'] ?> Peers</span>
-                    </div>
-                      <?php if($content['geo']){ ?>
-                    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                      <span class="count_top"><i class="fa fa-globe blue"></i> Most Popular Country</span>
-                      <div class="count"><?= $content['details']['mpCou'] ?></div>
-                      <span class="count_bottom"><?= $content['details']['mpCouC'] ?> Peers</span>
-                    </div>
-                    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                      <span class="count_top"><i class="fa fa-server" style="color:orange;"></i> Most Popular ISP</span>
-                      <div class="count"><?= $content['details']['mpIsp'] ?></div>
-                      <span class="count_bottom"><?= $content['details']['mpIspC'] ?> Peers</span>
-                    </div>
-                    <?php } ?>
                     <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
                       <span class="count_top"><i class="fa fa-lock"></i> SSL Support</span>
                       <div class="count"><?= $content['details']['sslp'] ?><small>%</small></div>
@@ -33,10 +16,27 @@
                       <span class="count_top"><i class="fa fa-user-secret"></i> Tor</span>
                       <div class="count"><?= $content['details']['torp'] ?><small>%</small></div>
                       <span class="count_bottom"><span><?= $content['details']['torc'] ?></span> Peers</span>
-                    </div>                    
+                    </div>
+                    <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
+                      <span class="count_top"><i class="fa fa-star"></i> Most Popular Client Version</span>
+                      <div class="count"><?= $content['details']['mpCli'] ?></div>
+                      <span class="count_bottom"> <?= $content['details']['mpCliC'] ?> Peers</span>
+                    </div>
+                    <?php if($content['geo']){ ?>
+                      <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                        <span class="count_top"><i class="fa fa-globe blue"></i> Most Popular Country</span>
+                        <div class="count"><?= $content['details']['mpCou'] ?></div>
+                        <span class="count_bottom"><?= $content['details']['mpCouC'] ?> Peers</span>
+                      </div>
+                      <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                        <span class="count_top"><i class="fa fa-server" style="color:orange;"></i> Most Popular ISP</span>
+                        <div class="count"><?= $content['details']['mpIsp'] ?></div>
+                        <span class="count_bottom"><?= $content['details']['mpIspC'] ?> Peers</span>
+                      </div>
+                    <?php } ?>                 
                   </div>
-                  </div>
-             </div>
+                </div>
+            </div>
 			<!-- Top Info Bar End-->
 			<div class="clearfix"></div>
           <div class="row">
@@ -59,6 +59,7 @@
                     <ul class="nav navbar-right panel_toolbox">
                       <li><a class="close-link"><i class="fa fa-close"></i></a></li>
                       <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                      <?php if(isset($content['api'])) { ?><li><a><i class="fa fa-refresh" data-toggle="tooltip" data-html="true" data-placement="left" title="<?= $content["api"]["callc"] ?> call(s) to API with <?= $content["api"]["ipc"] ?> new ips."></i></a></li><?php }?>
                     </ul>
                     <div class="clearfix"></div>
                   </div>

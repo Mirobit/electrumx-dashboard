@@ -5,10 +5,11 @@ namespace App;
 function createMainContent(){
 	$sessionsData = getSessionsData();
 	$content['node'] = new Node();
-	if(Config::PEERS_GEO){
-		$content['map'] = createMapJs($content['node']->sessionsC);
+	if(Config::SESSIONS_GEO){
+		$content['map'] = createMapJs($content['node']->sessionsC, $sessionsData['countrylist']);
 	}
-	$content['geo'] = Config::PEERS_GEO;
+  $content['geo'] = Config::SESSIONS_GEO;
+  if(isset($sessionsData['api'])) $content['api'] = $sessionsData['api'];
   $content['chartdata'] = getTopClients($sessionsData['sessions']);
 	$content['totaltrafficin'] = $sessionsData['totaltrafficin'];
 	$content['totaltrafficout'] = $sessionsData['totaltrafficout'];
@@ -18,7 +19,6 @@ function createMainContent(){
 
 function createSessionsContent(){
   $sessionsData = getSessionsData();
-
   $content['details'] = getMostPop($sessionsData['sessions']);
   $content['sessions'] = $sessionsData['sessions'];
   $content['sessionsc'] = count($sessionsData['sessions']);
@@ -27,21 +27,22 @@ function createSessionsContent(){
 	$content['totaltrafficin'] = $sessionsData['totaltrafficin'];
 	$content['totaltrafficout'] = $sessionsData['totaltrafficout'];
 	$content['totaltrafficinper'] = round($sessionsData['totaltrafficin']/$sessionsData['totaltraffic'],2)*100;
-	$content['geo'] = Config::PEERS_GEO;
+  $content['geo'] = Config::SESSIONS_GEO;
+  if(isset($sessionsData['api'])) $content['api'] = $sessionsData['api'];
 
   return $content;
 }
 
 function createPeersContent(){
     $peersData = getPeersData();
-
     $content['details'] = getMostPop($peersData['peers'], false);
     $content['peers'] = $peersData['peers'];
     $content['peersc'] = count($peersData['peers']);
     $content['details']['sslp'] = round($content['details']['sslc']/$content['peersc'],2)*100;
     $content['details']['tcpp'] = round($content['details']['tcpc']/$content['peersc'],2)*100;
     $content['details']['torp'] = round($content['details']['torc']/$content['peersc'],2)*100;
-		$content['geo'] = Config::PEERS_GEO;
+    $content['geo'] = Config::PEERS_GEO;
+    if(isset($peersData['api'])) $content['api'] = $peersData['api'];
 
     return $content;
 }

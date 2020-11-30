@@ -2,15 +2,10 @@
          <div class="panel panel-default">  
             <div class="panel-body">
                 <div class="row tile_count">
-                    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                    <div class="col-md-1 col-sm-4 col-xs-6 tile_stats_count">
                       <span class="count_top"><i class="fa fa-user"></i> Sessions</span>
                       <div class="count"><?= $content['sessionsc'] ?></div>
-                      <span class="count_bottom"><i class="fa fa-plug" style="color:lightblue;"></i><?= $content['details']['subscribersc'] ?> Subscribers</span>
-                    </div>
-                    <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
-                      <span class="count_top"><i class="fa fa-star"></i> Most Popular Client Version</span>
-                      <div class="count"><?= $content['details']['mpCli'] ?></div>
-                      <span class="count_bottom"><i class="fa fa-user-o"></i><?= $content['details']['mpCliC'] ?> Sessions</span>
+                      <span class="count_bottom"><i class="fa fa-plug" style="color:lightblue;"></i><?= $content['details']['subscribersc'] ?> Subs</span>
                     </div>
                     <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
                       <span class="count_top"><i class="fa fa-lock"></i> SSL Connections</span>
@@ -21,6 +16,11 @@
                       <span class="count_top"><i class="fa fa-cloud"></i> Traffic <?= ($content['totaltraffic'] >= 1000) ? "(GB)" : "(MB)"?></span>
                       <div class="count"><?= ($content['totaltraffic'] >= 1000) ? round($content['totaltraffic']/1000,1)." <small>GB</small>" : round($content['totaltraffic'],1)." <small>MB</small>"?></div>
                       <span class="count_bottom"><i class="fa fa-cloud-upload" style="color:lightblue;"></i> <?= $content['totaltrafficinper'] ?>% Upload</span>
+                    </div>
+                    <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
+                      <span class="count_top"><i class="fa fa-star"></i> Most Popular Client Version</span>
+                      <div class="count"><?= $content['details']['mpCli'] ?></div>
+                      <span class="count_bottom"><i class="fa fa-user-o"></i><?= $content['details']['mpCliC'] ?> Sessions</span>
                     </div>
                     <?php if($content['geo']){ ?>
                       <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
@@ -59,9 +59,8 @@
                     <ul class="nav navbar-right panel_toolbox">
                       <li><a class="close-link"><i class="fa fa-close"></i></a>
                       <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-					  <li><a><i class="fa fa-question-circle-o" data-toggle="tooltip" data-html="true" data-placement="left" title="
-                      Click the 'Rules' button below to run rules."></i></a>
-                      </li>
+					            <li><a><i class="fa fa-question-circle-o" data-toggle="tooltip" data-html="true" data-placement="left" title="Click the 'Rules' button below to run rules."></i></a></li>
+                      <?php if(isset($content['api'])) { ?><li><a><i class="fa fa-refresh" data-toggle="tooltip" data-html="true" data-placement="left" title="<?= $content["api"]["callc"] ?> call(s) to API with <?= $content["api"]["ipc"] ?> new ips."></i></a></li><?php }?> 
                     </ul>
                     <div class="clearfix"></div>
                   </div>

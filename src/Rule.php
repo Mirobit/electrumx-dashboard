@@ -84,7 +84,7 @@ class Rule {
      * @return bool
      */
     public static function run() {
-		global $bitcoind; 
+		global $exd; 
 
         $data = self::getData();
 		

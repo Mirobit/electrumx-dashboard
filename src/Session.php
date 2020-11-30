@@ -33,8 +33,8 @@ class Session{
 		}
 		$this->ip = getCleanIP($session[2]);
 		$this->ipv6 = checkIfIpv6($this->ip);
-		$this->client = htmlspecialchars(($session[3]));
-		$this->protocol = htmlspecialchars(($session[4]));
+		$this->client = str_replace("electrum/", "Electrum ", htmlspecialchars($session[3]));
+		$this->protocol = htmlspecialchars($session[4]);
 		$this->txsC = checkInt($session[8]);
 		$this->subscriptionsC = checkInt($session[9]);
 		$this->messagesRec = checkInt($session[10]);
