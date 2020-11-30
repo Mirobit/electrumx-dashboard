@@ -553,12 +553,12 @@ function getPeersGeoData($peersRPC){
 function getIpData($ips){
 	global $error;
   $apiData['api']['callc'] = 0;
-	$numOfIps = count($ips);
-	// ip-api.com allows 15 requests with 100 ips per minute. Since peers and sessions are
-	// called seperatly, is the limit here lower than 1500.
-	if($numOfIps > 100){
-		$numOfIps = 100;
-  }
+
+  // ip-api.com allows 15 requests with 100 ips per minute. The limit here is lower since
+  // new peers could connect within a minute a trigger additional calls.
+  $numOfIps = count($ips);
+	if($numOfIps > 1200) $numOfIps = 1200;
+
 
   $apiData['api']['ipc'] = $numOfIps;
 	$j = 0;
