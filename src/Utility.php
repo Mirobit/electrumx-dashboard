@@ -301,8 +301,9 @@ function getPeersData(bool $geo = CONFIG::PEERS_GEO) {
 
 // For sessions (geo)
 function getSessionsGeoData($sessionsRPC){
-	$countryList = [];
-	$hosterC = 0;
+  $countryList = [];
+  $arraySessions = [];
+  $hosterC = 0;
   $privateC = 0;
   $newSessionsC = 0;
   $noGeoData = false;
@@ -310,15 +311,15 @@ function getSessionsGeoData($sessionsRPC){
   $sessionData['totaltrafficin'] = 0;
   $sessionData['totaltrafficout'] = 0;
 
-	// Check if session file exists and enabled
-	if (file_exists('data/geodatasessions.inc')){
-		// Loads serialized stored sessions from disk
-		$serializedSessions = file_get_contents('data/geodatasessions.inc');
-		$arraySessions = unserialize($serializedSessions);
-		// Check if client was restarted and IDs reassigned
-		$oldestSessionId = reset($sessionsRPC)[0];
-		$oldestSessionIp = getCleanIP(reset($sessionsRPC)[2]);
-		$delete = false;
+  // Check if session file exists and enabled
+  if (file_exists('data/geodatasessions.inc')){
+    // Loads serialized stored sessions from disk
+    $serializedSessions = file_get_contents('data/geodatasessions.inc');
+    $arraySessions = unserialize($serializedSessions);
+    // Check if client was restarted and IDs reassigned
+    $oldestSessionId = reset($sessionsRPC)[0];
+    $oldestSessionIp = getCleanIP(reset($sessionsRPC)[2]);
+    $delete = false;
 		// Checks if we know about the oldest sessions, if not we assume that we don't known any session
 		foreach($arraySessions as $key => $session){
 			if($oldestSessionIp == $session[0]){
@@ -330,7 +331,7 @@ function getSessionsGeoData($sessionsRPC){
 				break;
 			}
 			// For removing old sessions that disconnected. Value of all sessions that are still conected will be changed to 1 later. All sessions with 0 at the end of the function will be deleted
-			$arraySessions[$key][7] = 0;
+			$arraySessions[$key][6] = 0;
 		}
 		// Oldest session hasn't shown up -> Node isn't connected to any of the previously stored sessions
 		if(!$delete){
@@ -458,9 +459,10 @@ function getSessionsGeoData($sessionsRPC){
   }
 
   // Write update session data to file
-  $newSerializeSessions = serialize($arraySessions);
-  file_put_contents('data/geodatasessions.inc', $newSerializeSessions);
-  
+  if(!empty($arraySessions)) {
+    $newSerializeSessions = serialize($arraySessions);
+    file_put_contents('data/geodatasessions.inc', $newSerializeSessions);
+  }
   return $sessionData;
 }
 
